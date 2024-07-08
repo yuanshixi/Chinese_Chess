@@ -15,8 +15,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-include_directories(/mingw64/include)
-link_directories(/mingw64/lib)
+include_directories(/3rd-party/SFML-2.6.1-windows-gcc-13.1.0-mingw-64-bit/SFML-2.6.1/include)
+link_directories(/3rd-party/SFML-2.6.1-windows-gcc-13.1.0-mingw-64-bit/SFML-2.6.1/lib)
 
 file(GLOB SRC_FILES "src/*.cpp")
 add_executable(ChineseChess ${SRC_FILES})

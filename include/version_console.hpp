@@ -6,6 +6,7 @@
 #include "board.hpp"
 #include "moves_gen.hpp"
 #include "ai.hpp"
+#include "extra_funcs.hpp"
 
 using namespace cnchess;
 
@@ -45,46 +46,6 @@ std::string convert_move_to_str(const MoveNode& move){
     buf += static_cast<char>(move.endCol - BOARD_ACTUAL_COL_BEGIN + 'a');
     buf += static_cast<char>(9 - (move.endRow - BOARD_ACTUAL_ROW_BEGIN) + '0');
     return buf;
-}
-
-// every one can only move his pieces, not the enemy's.
-bool check_is_this_your_piece(const ChessBoard& cb, const MoveNode& move, PieceSide side){
-    Piece p = cb.get(move.beginRow, move.beginCol);
-    return piece_get_side(p) == side;
-}
-
-// if no one wins, return PS_EXTRA.
-PieceSide check_winner(const ChessBoard& cb){
-    bool upAlive = false;
-    bool downAlive = false;
-
-    for (int32_t r = BOARD_9_PALACE_UP_TOP; r <= BOARD_9_PALACE_UP_BOTTOM; ++r) {
-        for (int32_t c = BOARD_9_PALACE_UP_LEFT; c <= BOARD_9_PALACE_UP_RIGHT; ++c) {
-            if (cb.get(r, c) == P_UG) {
-                upAlive = true;
-                break;
-            }
-        }
-    }
-
-    for (int32_t r = BOARD_9_PALACE_DOWN_TOP; r <= BOARD_9_PALACE_DOWN_BOTTOM; ++r) {
-        for (int32_t c = BOARD_9_PALACE_DOWN_LEFT; c <= BOARD_9_PALACE_DOWN_RIGHT; ++c) {
-            if (cb.get(r, c) == P_DG) {
-                downAlive = true;
-                break;
-            }
-        }
-    }
-
-    if (upAlive && downAlive) {
-        return PS_EXTRA;
-    }
-    else if (upAlive) {
-        return PS_UP;
-    }
-    else {
-        return PS_DOWN;
-    }
 }
 
 void print_board_to_console(const ChessBoard& cb){

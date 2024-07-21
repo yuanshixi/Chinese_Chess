@@ -17,7 +17,7 @@ namespace cnchess {
     }
 
     static void 
-    gen_possible_moves_for_pawn(const ChessBoard& cb, PossibleMoves pm, int32_t r, int32_t c, PieceSide side){
+    gen_possible_moves_for_pawn(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
         if (side == PS_UP){
             check_possible_move_and_insert(cb, pm,  r, c, r + 1, c);
 

@@ -1121,15 +1121,18 @@ void print_board_to_console(const ChessBoard& cb){
     int endCol = BOARD_ACTUAL_COL_BEGIN + BOARD_ACTUAL_COL_LEN;
     int n = BOARD_ACTUAL_ROW_LEN - 1;
 
+    cc.set(ConsoleColor::BoldYellow);
     std::cout << "\n    +-------------------+\n";
 
     int r, c;
     for (r = BOARD_ACTUAL_ROW_BEGIN; r < endRow; ++r) {
         if (r == splitLineIndex){
+            cc.set(ConsoleColor::BoldYellow);
             std::cout << "    |===================|\n";
             std::cout << "    |===================|\n";
         }
 
+        cc.set(ConsoleColor::BoldYellow);
         std::cout << " " << n-- << "  | ";
 
         for (c = BOARD_ACTUAL_COL_BEGIN; c < endCol; ++c){
@@ -1138,13 +1141,13 @@ void print_board_to_console(const ChessBoard& cb){
             if (piece_get_side(p) == PS_UP) {
                 cc.set(ConsoleColor::BoldBlue);
                 std::cout << piece_get_char(p);
-                cc.reset();
+                cc.set(ConsoleColor::BoldYellow);
                 std::cout << " ";
             }
             else if (piece_get_side(p) == PS_DOWN) {
                 cc.set(ConsoleColor::BoldRed);
                 std::cout << piece_get_char(p);
-                cc.reset();
+                cc.set(ConsoleColor::BoldYellow);
                 std::cout << " ";
             }
             else {
@@ -1152,11 +1155,14 @@ void print_board_to_console(const ChessBoard& cb){
             }
         }
 
+        cc.set(ConsoleColor::BoldYellow);
         std::cout << "|\n";
     }
 
+    cc.set(ConsoleColor::BoldYellow);
     std::cout << "    +-------------------+\n";
     std::cout << "\n      a b c d e f g h i\n\n";
+    cc.reset();
 }
 
 void print_help_page(){

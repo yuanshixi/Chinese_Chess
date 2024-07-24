@@ -1001,7 +1001,7 @@ class ConsoleColor {
             case Blue: 
                 return FOREGROUND_BLUE;
             case Green: 
-                return FOREGROUND_GREEN | FOREGROUND_BLUE;
+                return FOREGROUND_GREEN;
             case Cyan: 
                 return FOREGROUND_GREEN | FOREGROUND_BLUE;
             case Red: 
@@ -1017,7 +1017,7 @@ class ConsoleColor {
             case BoldBlue: 
                 return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
             case BoldGreen: 
-                return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+                return FOREGROUND_GREEN | FOREGROUND_INTENSITY;
             case BoldCyan: 
                 return FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
             case BoldRed: 
@@ -1123,18 +1123,18 @@ void print_board_to_console(const ChessBoard& cb){
     int endCol = BOARD_ACTUAL_COL_BEGIN + BOARD_ACTUAL_COL_LEN;
     int n = BOARD_ACTUAL_ROW_LEN - 1;
 
-    cc.set(ConsoleColor::BoldYellow);
+    cc.set(ConsoleColor::BoldWhite);
     std::cout << "\n    +-------------------+\n";
 
     int r, c;
     for (r = BOARD_ACTUAL_ROW_BEGIN; r < endRow; ++r) {
         if (r == splitLineIndex){
-            cc.set(ConsoleColor::BoldYellow);
+            cc.set(ConsoleColor::BoldWhite);
             std::cout << "    |===================|\n";
             std::cout << "    |===================|\n";
         }
 
-        cc.set(ConsoleColor::BoldYellow);
+        cc.set(ConsoleColor::BoldWhite);
         std::cout << " " << n-- << "  | ";
 
         for (c = BOARD_ACTUAL_COL_BEGIN; c < endCol; ++c){
@@ -1143,13 +1143,13 @@ void print_board_to_console(const ChessBoard& cb){
             if (piece_get_side(p) == PS_UP) {
                 cc.set(ConsoleColor::BoldBlue);
                 std::cout << piece_get_char(p);
-                cc.set(ConsoleColor::BoldYellow);
+                cc.set(ConsoleColor::BoldWhite);
                 std::cout << " ";
             }
             else if (piece_get_side(p) == PS_DOWN) {
                 cc.set(ConsoleColor::BoldRed);
                 std::cout << piece_get_char(p);
-                cc.set(ConsoleColor::BoldYellow);
+                cc.set(ConsoleColor::BoldWhite);
                 std::cout << " ";
             }
             else {
@@ -1157,11 +1157,11 @@ void print_board_to_console(const ChessBoard& cb){
             }
         }
 
-        cc.set(ConsoleColor::BoldYellow);
+        cc.set(ConsoleColor::BoldWhite);
         std::cout << "|\n";
     }
 
-    cc.set(ConsoleColor::BoldYellow);
+    cc.set(ConsoleColor::BoldWhite);
     std::cout << "    +-------------------+\n";
     std::cout << "\n      a b c d e f g h i\n\n";
     cc.reset();

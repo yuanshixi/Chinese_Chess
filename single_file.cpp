@@ -1053,10 +1053,12 @@ public:
     };
 
     ConsoleColor() {
+	#ifdef _WIN32
         CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-	    hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	    GetConsoleScreenBufferInfo(hOutHandle, &csbiInfo);
-	    oldColorAttrs = csbiInfo.wAttributes;
+	hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	GetConsoleScreenBufferInfo(hOutHandle, &csbiInfo);
+	oldColorAttrs = csbiInfo.wAttributes;
+	#endif
     }
 
     ~ConsoleColor() noexcept {

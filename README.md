@@ -4,4 +4,5 @@
 ##### libraries: SFML-2.6.1
 ##### a single file version is provided, only for console mode(linux/windows), supports color output.
 
-![image](https://github.com/yuanluo2/Small-Chinese_Chess_Cpp/assets/49439486/01809f51-3398-43e1-bf4a-c0f7eef2dba4)
+![image](https://github.com/user-attachments/assets/992ded9c-5f67-4a4b-b0f8-6e630cbc7a63)
+

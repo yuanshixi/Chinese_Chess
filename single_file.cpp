@@ -1255,6 +1255,7 @@ int main(){
 
                     if (check_winner(cb) == userSide){
                         std::cout << "Congratulations! You win!\n";
+			return;
                     }
 
                     std::cout << "AI thinking...\n";
@@ -1268,6 +1269,7 @@ int main(){
 
                     if (check_winner(cb) == aiSide){
                         std::cout << "Game over! You lose!\n";
+			return;
                     }
                 }
                 else {

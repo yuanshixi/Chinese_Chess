@@ -814,15 +814,13 @@ int32_t min_max(ChessBoard& cb, uint8_t searchDepth, int32_t alpha, int32_t beta
         return board_calc_score(cb);
     }
 
-    int32_t minMaxValue;
     if (side == PS_UP){
         int32_t minValue = std::numeric_limits<int32_t>::max();
         PossibleMoves possibleMoves = gen_possible_moves(cb, PS_UP);
 
         for (const MoveNode& node : possibleMoves) {
             cb.move(node);
-            minMaxValue = min_max(cb, searchDepth - 1, alpha, beta, PS_DOWN);
-            minValue = std::min(minValue, minMaxValue);
+            minValue = std::min(minValue, min_max(cb, searchDepth - 1, alpha, beta, PS_DOWN));
             cb.undo();
 
             beta = std::min(beta, minValue);
@@ -839,8 +837,7 @@ int32_t min_max(ChessBoard& cb, uint8_t searchDepth, int32_t alpha, int32_t beta
 
         for (const MoveNode& node : possibleMoves) {
             cb.move(node);
-            minMaxValue = min_max(cb, searchDepth - 1, alpha, beta, PS_UP);
-            maxValue = std::max(maxValue, minMaxValue);
+            maxValue = std::max(maxValue, min_max(cb, searchDepth - 1, alpha, beta, PS_UP));
             cb.undo();
 
             alpha = std::max(alpha, maxValue);

@@ -5,9 +5,7 @@
 #include <deque>
 #include <algorithm>
 #include <limits>
-#include <cstdio>
 #include <cstdint>
-#include <cstring>
 
 #ifdef _WIN32
 #include <windows.h>

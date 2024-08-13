@@ -43,7 +43,7 @@ constexpr int32_t BOARD_9_PALACE_DOWN_RIGHT   = BOARD_ACTUAL_COL_BEGIN + 5;
 constexpr int32_t MAX_ONE_SIDE_POSSIBLE_MOVES_LEN = 256;
 
 // default AI difficulty.
-constexpr uint8_t DEFAULT_AI_SEARCH_DEPTH = 4;
+constexpr uint16_t DEFAULT_AI_SEARCH_DEPTH = 4;
 
 // piece side.
 enum PieceSide{
@@ -364,7 +364,7 @@ constexpr int32_t piece_get_pos_value(Piece p, int32_t r, int32_t c){
     a default chess board, used as a template for new board.
     P_EO is used here for speeding up rules checking.
 */
-constexpr Piece CHESS_BOARD_DEFAULT_TEMPLATE[BOARD_ROW_LEN][BOARD_COL_LEN] = {
+constexpr Piece DEFAULT_CHESS_BOARD_DATA[BOARD_ROW_LEN][BOARD_COL_LEN] = {
     { P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO },
     { P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO },
     { P_EO, P_EO, P_UR, P_UN, P_UB, P_UA, P_UG, P_UA, P_UB, P_UN, P_UR, P_EO, P_EO },
@@ -425,7 +425,7 @@ class ChessBoard{
     std::deque<HistoryNode> history;
 public:
     ChessBoard(){
-        memcpy(&(data[0]), &CHESS_BOARD_DEFAULT_TEMPLATE, BOARD_ROW_LEN * BOARD_COL_LEN * sizeof(Piece));
+        clear();
     }
 
     Piece get(int32_t r, int32_t c) const noexcept {
@@ -434,6 +434,16 @@ public:
 
     void set(int32_t r, int32_t c, Piece p) noexcept {
         data[r][c] = p;
+    }
+
+    void clear() noexcept {
+        for (int32_t r = 0; r < BOARD_ROW_LEN; ++r) {
+            for (int32_t c = 0; c < BOARD_COL_LEN; ++c) {
+                data[r][c] = DEFAULT_CHESS_BOARD_DATA[r][c]; 
+            }
+        }
+
+        history.clear();
     }
 
     void move(const MoveNode& moveNode){
@@ -809,7 +819,7 @@ int32_t board_calc_score(const ChessBoard& cb){
 }
 
 // min-max algorithm, with alpha-beta pruning.
-int32_t min_max(ChessBoard& cb, uint8_t searchDepth, int32_t alpha, int32_t beta, PieceSide side){
+int32_t min_max(ChessBoard& cb, uint16_t searchDepth, int32_t alpha, int32_t beta, PieceSide side){
     if (searchDepth == 0){
         return board_calc_score(cb);
     }
@@ -858,7 +868,7 @@ int32_t min_max(ChessBoard& cb, uint8_t searchDepth, int32_t alpha, int32_t beta
     searchDepth is used as difficulty rank, the bigger it is, the more time the generation costs.
     give param enum PieceSide: PS_EXTRA to this function is meaningless, you will always get a struct MoveNode object with {0, 0, 0, 0}.
 */
-MoveNode gen_best_move(ChessBoard& cb, PieceSide side, uint8_t searchDepth){
+MoveNode gen_best_move(ChessBoard& cb, PieceSide side, uint16_t searchDepth){
     int32_t value;
     int32_t alpha = std::numeric_limits<int32_t>::min();
     int32_t beta = std::numeric_limits<int32_t>::max();
@@ -1172,7 +1182,8 @@ void print_help_page(){
     std::cout << "    3. undo         - undo the previous move.\n";
     std::cout << "    4. exit or quit - exit the game.\n";
     std::cout << "    5. remake       - remake the game.\n";
-    std::cout << "    6. advice       - give me a best move.\n\n";
+    std::cout << "    6. diff         - change the AI difficulty.\n";
+    std::cout << "    7. advice       - give me a best move.\n\n";
     std::cout << "  The characters on the board have the following relationships: \n\n";
     std::cout << "    P -> AI side pawn.\n";
     std::cout << "    C -> AI side cannon.\n";
@@ -1195,89 +1206,132 @@ void print_help_page(){
     (void)getchar();
 }
 
+void state_help(ChessBoard const& cb) {
+    print_help_page();
+    print_board_to_console(cb);
+}
+
+void state_undo(ChessBoard& cb) {
+    cb.undo();
+    cb.undo();
+    print_board_to_console(cb);
+}
+
+void state_remake(ChessBoard& cb) {
+    cb.clear();
+    std::cout << "New cnchess started.\n";
+    print_board_to_console(cb);
+}
+
+void state_diff(uint16_t& searchDepth) {
+    std::string input;
+    std::cout << "Current difficulty is " << searchDepth << ", want to change it(y/n)? ";
+    
+    std::getline(std::cin, input);
+    if (input == "n") {
+        return;
+    }
+
+    std::cout << "change AI difficulty to (1 ~ 5): ";
+    std::getline(std::cin, input);
+    
+    searchDepth = std::stoi(input) % 5;
+    if (searchDepth == 0) {
+        searchDepth = 1;
+    }
+
+    std::cout << "current search depth is " << searchDepth << ".\n";
+}
+
+void state_advice(ChessBoard& cb, PieceSide userSide, uint16_t searchDepth) {
+    MoveNode advice = gen_best_move(cb, userSide, searchDepth);
+    std::string adviceStr = convert_move_to_str(advice);
+    std::cout << "Maybe you can try: " << adviceStr 
+                        << ", piece is " << piece_get_char(cb.get(advice.beginRow, advice.beginCol))
+                        << ".\n";
+}
+
+void state_try_move(ChessBoard& cb, std::string const& userInput, PieceSide userSide, PieceSide aiSide, uint16_t searchDepth, bool& running) {
+    if (!check_input_is_a_move(userInput)) {
+        std::cout << "Input is not a valid move nor instruction, please re-enter(try help ?).\n";
+        return;
+    }
+    
+    MoveNode userMove = convert_input_to_move(userInput);
+    if (!check_is_this_your_piece(cb, userMove, userSide)){
+        std::cout << "This piece is not yours, please choose your piece.\n";
+        return;
+    }
+
+    if (!check_rule(cb, userMove)){
+        std::cout << "Given move doesn't fit for rules, please re-enter.\n";
+        return;
+    }
+
+    cb.move(userMove);
+    print_board_to_console(cb);
+
+    if (check_winner(cb) == userSide){
+        std::cout << "Congratulations! You win!\n";
+        running = false;
+        return;
+    }
+
+    std::cout << "AI thinking...\n";
+
+    MoveNode aiMove = gen_best_move(cb, aiSide, searchDepth);
+    std::string aiMoveStr = convert_move_to_str(aiMove);
+    cb.move(aiMove);
+    print_board_to_console(cb);
+    std::cout << "AI move: " << aiMoveStr
+                << ", piece is '" << piece_get_char(cb.get(aiMove.endRow, aiMove.endCol)) 
+                << "'.\n";
+
+    if (check_winner(cb) == aiSide){
+        std::cout << "Game over! You lose!\n";
+        running = false;
+        return;
+    }
+}
+
 int main(){
     PieceSide userSide = PS_DOWN;
     PieceSide aiSide = PS_UP;
 
     ChessBoard cb;
     std::string userInput;
+    uint16_t searchDepth = DEFAULT_AI_SEARCH_DEPTH;
+    bool running = true;
 
     print_board_to_console(cb);
 
-    while (true){
+    while (running) {
         std::cout << "Your move: ";
         std::getline(std::cin, userInput);
 
-        if (userInput == "help"){
-            print_help_page();
-            print_board_to_console(cb);
+        if (userInput == "help") {
+            state_help(cb);
         }
-        else if (userInput == "undo"){
-            cb.undo();
-            cb.undo();
-            print_board_to_console(cb);
+        else if (userInput == "undo") {
+            state_undo(cb);
         }
-        else if (userInput == "quit"){
+        else if (userInput == "quit") {
             return 0;
         }
-        else if (userInput == "exit"){
+        else if (userInput == "exit") {
             return 0;
         }
-        else if (userInput == "remake"){
-            cb = ChessBoard{};
-
-            std::cout << "New cnchess started.\n";
-            print_board_to_console(cb);
-            continue;
+        else if (userInput == "remake") {
+            state_remake(cb);
         }
-        else if (userInput == "advice"){
-            MoveNode advice = gen_best_move(cb, userSide, DEFAULT_AI_SEARCH_DEPTH);
-            std::string adviceStr = convert_move_to_str(advice);
-            std::cout << "Maybe you can try: " << adviceStr 
-                        << ", piece is " << piece_get_char(cb.get(advice.beginRow, advice.beginCol))
-                        << ".\n";
+        else if (userInput == "diff") {
+            state_diff(searchDepth);
+        }
+        else if (userInput == "advice") {
+            state_advice(cb, userSide, searchDepth);
         }
         else{
-            if (check_input_is_a_move(userInput)){
-                MoveNode userMove = convert_input_to_move(userInput);
-                
-                if (!check_is_this_your_piece(cb, userMove, userSide)){
-                    std::cout << "This piece is not yours, please choose your piece.\n";
-                    continue;
-                }
-
-                if (check_rule(cb, userMove)){
-                    cb.move(userMove);
-                    print_board_to_console(cb);
-
-                    if (check_winner(cb) == userSide){
-                        std::cout << "Congratulations! You win!\n";
-			return 0;
-                    }
-
-                    std::cout << "AI thinking...\n";
-                    MoveNode aiMove = gen_best_move(cb, aiSide, DEFAULT_AI_SEARCH_DEPTH);
-                    std::string aiMoveStr = convert_move_to_str(aiMove);
-                    cb.move(aiMove);
-                    print_board_to_console(cb);
-                    std::cout << "AI move: " << aiMoveStr
-                             << ", piece is '" << piece_get_char(cb.get(aiMove.endRow, aiMove.endCol)) 
-                             << "'.\n";
-
-                    if (check_winner(cb) == aiSide){
-                        std::cout << "Game over! You lose!\n";
-			return 0;
-                    }
-                }
-                else {
-                    std::cout << "Given move doesn't fit for rules, please re-enter.\n";
-                    continue;
-                }
-            }
-            else {
-                std::cout << "Input is not a valid move nor instruction, please re-enter(try help ?).\n";
-                continue;
-            }
+            state_try_move(cb, userInput, userSide, aiSide, searchDepth, running);
         }
     }
 

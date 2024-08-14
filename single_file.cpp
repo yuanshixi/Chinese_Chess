@@ -1158,7 +1158,7 @@ void print_board_to_console(const ChessBoard& cb){
                 std::cout << " ";
             }
             else {
-                std::cout << piece_get_char(cb.get(r, c)) << " ";
+                std::cout << piece_get_char(p) << " ";
             }
         }
 

@@ -1233,7 +1233,7 @@ void state_diff(uint16_t& searchDepth) {
     std::cout << "change AI difficulty to (1 ~ 5): ";
     std::getline(std::cin, input);
     
-    searchDepth = std::stoi(input) % 5;
+    searchDepth = std::stoi(input) % 6;
     if (searchDepth == 0) {
         searchDepth = 1;
     }

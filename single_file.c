@@ -1450,7 +1450,7 @@ void state_diff(unsigned int* difficulty, String* input) {
     printf("change AI difficulty to (1 ~ 5): ");
     string_get_line(input);
     
-    *difficulty = atoi(input->data) % 5;
+    *difficulty = atoi(input->data) % 6;
     if (*difficulty == 0) {
         *difficulty = 1;
     }

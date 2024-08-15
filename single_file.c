@@ -1522,7 +1522,7 @@ int main() {
     String* input = string_create_new();
     ConsoleColorContext ctx;
     int running = 1;
-    unsigned int difficulty = 4;
+    unsigned int difficulty = 2;
     PieceSide userSide = PS_Down;
     PieceSide aiSide = PS_Up;
 

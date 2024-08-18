@@ -1093,6 +1093,9 @@ void string_get_line(String* str) {
         if (c == '\n' || c == EOF) {
             break;
         }
+	else if (c == ' ' || c == '\t') {   /* ignore all spaces and tab. */
+            continue;
+        }
         else {
             string_push_char(str, c);
         }

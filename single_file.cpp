@@ -15,16 +15,21 @@
 	Chinese chess board is 10 x 9,
 	to speed up rules checking, I added 2 lines for both the top, left, bottom and right sides.
 */
-constexpr int32_t BOARD_ROW_LEN = 14;
-constexpr int32_t BOARD_COL_LEN = 13;
-constexpr int32_t BOARD_ACTUAL_ROW_LEN = 10;
-constexpr int32_t BOARD_ACTUAL_COL_LEN = 9;
+constexpr int32_t BOARD_ROW_LEN = 10;
+constexpr int32_t BOARD_COL_LEN =  9;
+constexpr int32_t BOARD_ACTUAL_ROW_LEN = 14;
+constexpr int32_t BOARD_ACTUAL_COL_LEN = 13;
+
 constexpr int32_t BOARD_ACTUAL_ROW_BEGIN = 2;
 constexpr int32_t BOARD_ACTUAL_COL_BEGIN = 2;
+constexpr int32_t BOARD_ACTUAL_ROW_END = BOARD_ACTUAL_ROW_BEGIN + BOARD_ROW_LEN - 1;
+constexpr int32_t BOARD_ACTUAL_COL_END = BOARD_ACTUAL_COL_BEGIN + BOARD_COL_LEN - 1;
 
 // if a pawn has crossed the faced river, then he can move forward, left or right.
 constexpr int32_t BOARD_RIVER_UP = BOARD_ACTUAL_ROW_BEGIN + 4;
 constexpr int32_t BOARD_RIVER_DOWN = BOARD_ACTUAL_ROW_BEGIN + 5;
+
+constexpr int32_t BOARD_CHU_HAN_LINE = BOARD_ACTUAL_ROW_BEGIN + (BOARD_ROW_LEN) / 2;
 
 // piece: general and advisor must stay within the 9 palace.
 constexpr int32_t BOARD_9_PALACE_UP_TOP     = BOARD_ACTUAL_ROW_BEGIN;
@@ -149,7 +154,7 @@ constexpr int32_t pieceValueMapping[] = {
     every piece's position value on the chess board. 
     upper side piece's value is negative, down side is positive. 
 */
-constexpr int32_t piecePosValueMapping[][BOARD_ACTUAL_ROW_LEN][BOARD_ACTUAL_COL_LEN] = {
+constexpr int32_t piecePosValueMapping[][BOARD_ROW_LEN][BOARD_COL_LEN] = {
     /* Upper pawn. */
     {
         {   0,   0,   0,   0,   0,   0,   0,   0,   0 },
@@ -362,7 +367,7 @@ constexpr int32_t piece_get_pos_value(Piece p, int32_t r, int32_t c){
     a default chess board, used as a template for new board.
     P_EO is used here for speeding up rules checking.
 */
-constexpr Piece DEFAULT_CHESS_BOARD_DATA[BOARD_ROW_LEN][BOARD_COL_LEN] = {
+constexpr Piece DEFAULT_CHESS_BOARD_DATA[BOARD_ACTUAL_ROW_LEN][BOARD_ACTUAL_COL_LEN] = {
     { P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO },
     { P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO, P_EO },
     { P_EO, P_EO, P_UR, P_UN, P_UB, P_UA, P_UG, P_UA, P_UB, P_UN, P_UR, P_EO, P_EO },
@@ -419,7 +424,7 @@ struct HistoryNode{
 
 // chess board.
 class ChessBoard{
-    std::array<std::array<Piece, BOARD_COL_LEN>, BOARD_ROW_LEN> data;
+    std::array<std::array<Piece, BOARD_ACTUAL_COL_LEN>, BOARD_ACTUAL_ROW_LEN> data;
     std::deque<HistoryNode> history;
 public:
     ChessBoard(){
@@ -435,8 +440,8 @@ public:
     }
 
     void clear() noexcept {
-        for (int32_t r = 0; r < BOARD_ROW_LEN; ++r) {
-            for (int32_t c = 0; c < BOARD_COL_LEN; ++c) {
+        for (int32_t r = 0; r < BOARD_ACTUAL_ROW_LEN; ++r) {
+            for (int32_t c = 0; c < BOARD_ACTUAL_COL_LEN; ++c) {
                 data[r][c] = DEFAULT_CHESS_BOARD_DATA[r][c]; 
             }
         }
@@ -691,7 +696,7 @@ void gen_possible_moves_for_general(const ChessBoard& cb, PossibleMoves& pm, int
         }
 
         // check if both generals faced each other directly.
-        for (row = r + 1; row < BOARD_ACTUAL_ROW_BEGIN + BOARD_ACTUAL_ROW_LEN ;++row){
+        for (row = r + 1; row <= BOARD_ACTUAL_ROW_END ;++row){
             p = cb.get(row, c);
 
             if (p == P_EE){
@@ -748,12 +753,9 @@ PossibleMoves gen_possible_moves(const ChessBoard& cb, PieceSide side){
 	PossibleMoves pm;
 	pm.reserve(MAX_ONE_SIDE_POSSIBLE_MOVES_LEN);
 
-    int32_t endRow = BOARD_ACTUAL_ROW_BEGIN + BOARD_ACTUAL_ROW_LEN;
-    int32_t endCol = BOARD_ACTUAL_COL_BEGIN + BOARD_ACTUAL_COL_LEN;
-
     Piece p;
-    for (int32_t r = BOARD_ACTUAL_ROW_BEGIN; r < endRow; ++r) {
-        for (int32_t c = BOARD_ACTUAL_COL_BEGIN; c < endCol; ++c){
+    for (int32_t r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
+        for (int32_t c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c){
             p = cb.get(r, c);
 
             if (piece_get_side(p) == side){
@@ -798,12 +800,10 @@ PossibleMoves gen_possible_moves(const ChessBoard& cb, PieceSide side){
 */
 int32_t board_calc_score(const ChessBoard& cb){
     int32_t totalScore = 0;
-    int32_t endRow = BOARD_ACTUAL_ROW_BEGIN + BOARD_ACTUAL_ROW_LEN;
-    int32_t endCol = BOARD_ACTUAL_COL_BEGIN + BOARD_ACTUAL_COL_LEN;
 
     Piece p;
-    for (int32_t r = BOARD_ACTUAL_ROW_BEGIN; r < endRow; ++r) {
-        for (int32_t c = BOARD_ACTUAL_COL_BEGIN; c < endCol; ++c){
+    for (int32_t r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
+        for (int32_t c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c){
             p = cb.get(r, c);
 
 			if (p != P_EE){
@@ -1123,17 +1123,14 @@ public:
 
 void print_board_to_console(const ChessBoard& cb){
     ConsoleColor cc;
-    int splitLineIndex = BOARD_ACTUAL_ROW_BEGIN + (BOARD_ACTUAL_ROW_LEN / 2);
-    int endRow = BOARD_ACTUAL_ROW_BEGIN + BOARD_ACTUAL_ROW_LEN;
-    int endCol = BOARD_ACTUAL_COL_BEGIN + BOARD_ACTUAL_COL_LEN;
-    int n = BOARD_ACTUAL_ROW_LEN - 1;
+    int n = BOARD_ROW_LEN - 1;
 
     cc.set(ConsoleColor::BoldWhite);
     std::cout << "\n    +-------------------+\n";
 
     int r, c;
-    for (r = BOARD_ACTUAL_ROW_BEGIN; r < endRow; ++r) {
-        if (r == splitLineIndex){
+    for (r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
+        if (r == BOARD_CHU_HAN_LINE){
             cc.set(ConsoleColor::BoldWhite);
             std::cout << "    |===================|\n";
             std::cout << "    |===================|\n";
@@ -1142,7 +1139,7 @@ void print_board_to_console(const ChessBoard& cb){
         cc.set(ConsoleColor::BoldWhite);
         std::cout << " " << n-- << "  | ";
 
-        for (c = BOARD_ACTUAL_COL_BEGIN; c < endCol; ++c){
+        for (c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c){
             Piece p = cb.get(r, c);
 
             if (piece_get_side(p) == PS_UP) {

@@ -1291,6 +1291,11 @@ void state_try_move(ChessBoard& cb, std::string const& userInput, PieceSide user
     }
 }
 
+void welcome() {
+    std::cout << "Welcome to this cnchess game, down side is you, upper is AI.\n";
+    std::cout << "You can type 'help' for more detail or just type 'h2e2' to begin.\n";
+}
+
 int main(){
     PieceSide userSide = PS_DOWN;
     PieceSide aiSide = PS_UP;
@@ -1300,6 +1305,7 @@ int main(){
     uint16_t searchDepth = DEFAULT_AI_SEARCH_DEPTH;
     bool running = true;
 
+    welcome();
     print_board_to_console(cb);
 
     while (running) {

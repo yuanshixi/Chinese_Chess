@@ -1198,7 +1198,9 @@ void print_help_page(){
     std::cout << "=======================================\n";
     std::cout << "Press any key to continue.\n";
 
-    (void)getchar();
+    // ignore any input.	
+    std::string line;
+    std::getline(std::cin, line);
 }
 
 void state_help(ChessBoard const& cb) {

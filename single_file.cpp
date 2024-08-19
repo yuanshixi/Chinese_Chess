@@ -484,7 +484,7 @@ void check_possible_move_and_insert(const ChessBoard& cb, PossibleMoves& pm, int
     }
 }
 
-void gen_possible_moves_for_pawn(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_pawn(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     if (side == PS_UP){
         check_possible_move_and_insert(cb, pm,  r, c, r + 1, c);
 
@@ -503,7 +503,7 @@ void gen_possible_moves_for_pawn(const ChessBoard& cb, PossibleMoves& pm, int32_
     }
 }
 
-void gen_possible_moves_for_cannon_one_direction(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, int32_t rGap, int32_t cGap, PieceSide side){
+void gen_moves_cannon_one_direction(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, int32_t rGap, int32_t cGap, PieceSide side){
     int32_t row, col;
     Piece p;
 
@@ -536,15 +536,15 @@ void gen_possible_moves_for_cannon_one_direction(const ChessBoard& cb, PossibleM
     }
 }
 
-void gen_possible_moves_for_cannon(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_cannon(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     // go up, down, left, right.
-    gen_possible_moves_for_cannon_one_direction(cb, pm, r, c, -1, 0, side);
-    gen_possible_moves_for_cannon_one_direction(cb, pm, r, c, +1, 0, side);
-    gen_possible_moves_for_cannon_one_direction(cb, pm, r, c, 0, -1, side);
-    gen_possible_moves_for_cannon_one_direction(cb, pm, r, c, 0, +1, side);
+    gen_moves_cannon_one_direction(cb, pm, r, c, -1, 0, side);
+    gen_moves_cannon_one_direction(cb, pm, r, c, +1, 0, side);
+    gen_moves_cannon_one_direction(cb, pm, r, c, 0, -1, side);
+    gen_moves_cannon_one_direction(cb, pm, r, c, 0, +1, side);
 }
 
-void gen_possible_moves_for_rook_one_direction(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, int32_t rGap, int32_t cGap, PieceSide side){
+void gen_moves_rook_one_direction(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, int32_t rGap, int32_t cGap, PieceSide side){
     int32_t row, col;
     Piece p;
 
@@ -564,15 +564,15 @@ void gen_possible_moves_for_rook_one_direction(const ChessBoard& cb, PossibleMov
     }
 }
 
-void gen_possible_moves_for_rook(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_rook(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     // go up, down, left, right.
-    gen_possible_moves_for_rook_one_direction(cb, pm, r, c, -1, 0, side);
-    gen_possible_moves_for_rook_one_direction(cb, pm, r, c, +1, 0, side);
-    gen_possible_moves_for_rook_one_direction(cb, pm, r, c, 0, -1, side);
-    gen_possible_moves_for_rook_one_direction(cb, pm, r, c, 0, +1, side);
+    gen_moves_rook_one_direction(cb, pm, r, c, -1, 0, side);
+    gen_moves_rook_one_direction(cb, pm, r, c, +1, 0, side);
+    gen_moves_rook_one_direction(cb, pm, r, c, 0, -1, side);
+    gen_moves_rook_one_direction(cb, pm, r, c, 0, +1, side);
 }
 
-void gen_possible_moves_for_knight(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_knight(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     Piece p;
     if ((p = cb.get(r + 1, c)) == P_EE){    // if not lame horse leg ?
         check_possible_move_and_insert(cb, pm, r, c, r + 2, c + 1);
@@ -595,7 +595,7 @@ void gen_possible_moves_for_knight(const ChessBoard& cb, PossibleMoves& pm, int3
     }
 }
 
-void gen_possible_moves_for_bishop(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_bishop(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     Piece p;
     if (side == PS_UP){
         if (r + 2 <= BOARD_RIVER_UP){       // bishop can't cross river.
@@ -637,7 +637,7 @@ void gen_possible_moves_for_bishop(const ChessBoard& cb, PossibleMoves& pm, int3
     }
 }
 
-void gen_possible_moves_for_advisor(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_advisor(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     if (side == PS_UP){
         if (r + 1 <= BOARD_9_PALACE_UP_BOTTOM && c + 1 <= BOARD_9_PALACE_UP_RIGHT) {   // walk diagonal lines.
             check_possible_move_and_insert(cb, pm, r, c, r + 1, c + 1);
@@ -674,7 +674,7 @@ void gen_possible_moves_for_advisor(const ChessBoard& cb, PossibleMoves& pm, int
     }
 }
 
-void gen_possible_moves_for_general(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
+void gen_moves_general(const ChessBoard& cb, PossibleMoves& pm, int32_t r, int32_t c, PieceSide side){
     Piece p;
     int32_t row;
 
@@ -750,8 +750,8 @@ void gen_possible_moves_for_general(const ChessBoard& cb, PossibleMoves& pm, int
     you should call free() on the returned value later.
 */
 PossibleMoves gen_possible_moves(const ChessBoard& cb, PieceSide side){
-	PossibleMoves pm;
-	pm.reserve(MAX_ONE_SIDE_POSSIBLE_MOVES_LEN);
+    PossibleMoves pm;
+    pm.reserve(MAX_ONE_SIDE_POSSIBLE_MOVES_LEN);
 
     Piece p;
     for (int32_t r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
@@ -762,25 +762,25 @@ PossibleMoves gen_possible_moves(const ChessBoard& cb, PieceSide side){
                 switch (piece_get_type(p))
                 {
                 case PT_PAWN:
-                    gen_possible_moves_for_pawn(cb, pm, r, c, side);
+                    gen_moves_pawn(cb, pm, r, c, side);
                     break;
                 case PT_CANNON:
-                    gen_possible_moves_for_cannon(cb, pm, r, c, side);
+                    gen_moves_cannon(cb, pm, r, c, side);
                     break;
                 case PT_ROOK:
-                    gen_possible_moves_for_rook(cb, pm, r, c, side);
+                    gen_moves_rook(cb, pm, r, c, side);
                     break;
                 case PT_KNIGHT:
-                    gen_possible_moves_for_knight(cb, pm, r, c, side);
+                    gen_moves_knight(cb, pm, r, c, side);
                     break;
                 case PT_BISHOP:
-                    gen_possible_moves_for_bishop(cb, pm, r, c, side);
+                    gen_moves_bishop(cb, pm, r, c, side);
                     break;
                 case PT_ADVISOR:
-                    gen_possible_moves_for_advisor(cb, pm, r, c, side);
+                    gen_moves_advisor(cb, pm, r, c, side);
                     break;
                 case PT_GENERAL:
-                    gen_possible_moves_for_general(cb, pm, r, c, side);
+                    gen_moves_general(cb, pm, r, c, side);
                     break;
                 case PT_EMPTY:
                 case PT_OUT:
@@ -1121,7 +1121,7 @@ public:
     }
 };
 
-void print_board_to_console(const ChessBoard& cb){
+void draw_board(const ChessBoard& cb){
     ConsoleColor cc;
     int n = BOARD_ROW_LEN - 1;
 
@@ -1205,19 +1205,19 @@ void print_help_page(){
 
 void state_help(ChessBoard const& cb) {
     print_help_page();
-    print_board_to_console(cb);
+    draw_board(cb);
 }
 
 void state_undo(ChessBoard& cb) {
     cb.undo();
     cb.undo();
-    print_board_to_console(cb);
+    draw_board(cb);
 }
 
 void state_remake(ChessBoard& cb) {
     cb.clear();
     std::cout << "New cnchess started.\n";
-    print_board_to_console(cb);
+    draw_board(cb);
 }
 
 void state_diff(uint16_t& searchDepth) {
@@ -1266,7 +1266,7 @@ void state_try_move(ChessBoard& cb, std::string const& userInput, PieceSide user
     }
 
     cb.move(userMove);
-    print_board_to_console(cb);
+    draw_board(cb);
 
     if (check_winner(cb) == userSide){
         std::cout << "Congratulations! You win!\n";
@@ -1279,7 +1279,7 @@ void state_try_move(ChessBoard& cb, std::string const& userInput, PieceSide user
     MoveNode aiMove = gen_best_move(cb, aiSide, searchDepth);
     std::string aiMoveStr = convert_move_to_str(aiMove);
     cb.move(aiMove);
-    print_board_to_console(cb);
+    draw_board(cb);
     std::cout << "AI move: " << aiMoveStr
                 << ", piece is '" << piece_get_char(cb.get(aiMove.endRow, aiMove.endCol)) 
                 << "'.\n";
@@ -1306,7 +1306,7 @@ int main(){
     bool running = true;
 
     welcome();
-    print_board_to_console(cb);
+    draw_board(cb);
 
     while (running) {
         std::cout << "Your move: ";

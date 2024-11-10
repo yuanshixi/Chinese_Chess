@@ -179,6 +179,8 @@ void history_destroy(History* hist) {
 }
 
 void history_save(History* hist, MoveNode* mv, Piece beginP, Piece endP) {
+    HistoryNode* h;
+    
     if (hist->length == hist->capacity) {
         int newCapacity = 2 * hist->capacity;
         HistoryNode* temp = (HistoryNode*)realloc(hist->data, newCapacity * sizeof(HistoryNode));
@@ -190,7 +192,7 @@ void history_save(History* hist, MoveNode* mv, Piece beginP, Piece endP) {
         hist->capacity = newCapacity;
     }
 
-    HistoryNode* h = &(hist->data[hist->length]);
+    h = &(hist->data[hist->length]);
     h->beginRow = mv->beginRow;
     h->beginCol = mv->beginCol;
     h->endRow = mv->endRow;
@@ -272,11 +274,13 @@ void board_move(ChessBoard* cb, MoveNode* mv) {
 }
 
 void board_undo(ChessBoard* cb) {
+    HistoryNode* top;
+    
     if (history_is_empty(cb->history)) {
         return;
     }
 
-    HistoryNode* top = history_top(cb->history);
+    top = history_top(cb->history);
     cb->data[top->beginRow][top->beginCol] = top->beginP;
     cb->data[top->endRow][top->endCol] = top->endP;
     history_pop(cb->history);
@@ -314,9 +318,12 @@ void moves_destroy(Moves* moves) {
 }
 
 void moves_add(Moves* moves, int beginRow, int beginCol, int endRow, int endCol) {
+    MoveNode* temp;
+    MoveNode* m;
+    
     if (moves->length == moves->capacity) {
         int newCapacity = 2 * moves->capacity;
-        MoveNode* temp = (MoveNode*)realloc(moves->data, newCapacity * sizeof(MoveNode));
+        temp = (MoveNode*)realloc(moves->data, newCapacity * sizeof(MoveNode));
         if (temp == NULL) {
             log_error_die("can't expand moves capacity: memory is not enough.\n");
         }
@@ -325,7 +332,7 @@ void moves_add(Moves* moves, int beginRow, int beginCol, int endRow, int endCol)
         moves->capacity = newCapacity;
     }
 
-    MoveNode* m = &(moves->data[moves->length]);
+    m = &(moves->data[moves->length]);
     m->beginRow = beginRow;
     m->beginCol = beginCol;
     m->endRow = endRow;
@@ -636,14 +643,16 @@ void gen_moves_general(ChessBoard* cb, Moves* moves, int r, int c, PieceSide s) 
 }
 
 Moves* gen_moves(ChessBoard* cb, PieceSide s) {
+    Piece p;
+    int r, c;
+
+    Moves* moves;
+    
     if (s == PS_Extra) {
         return NULL;
     }
 
-    Piece p;
-    int r, c;
-
-    Moves* moves = moves_create_new();
+    moves = moves_create_new();
     for (r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
         for (c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c) {
             p = cb->data[r][c];
@@ -1183,7 +1192,7 @@ WORD get_windows_color_attr(int color) {
         default:
             return FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
     }
-};
+}
 #endif
 
 void reset_console_color(ConsoleColorContext* ctx) {
@@ -1259,12 +1268,12 @@ int check_rule(ChessBoard* cb, MoveNode* mv) {
 
 void draw_board(ConsoleColorContext* ctx, ChessBoard* cb) {
     int n = BOARD_ROW_LEN - 1;
+    int r, c;
+    Piece p;
 
     set_console_color(ctx, CC_BoldWhite);
     printf("\n    +-------------------+\n");
 
-    int r, c;
-    Piece p;
     for (r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
         if (r == BOARD_CHU_HAN_BOUNDARY) {
             set_console_color(ctx, CC_White);
@@ -1387,6 +1396,8 @@ void welcome(ConsoleColorContext* ctx, unsigned int difficulty) {
 }
 
 void print_help_page(void) {
+    char c;
+
     printf("\n=======================================\n");
     printf("Help Page\n\n");
     printf("    1. help         - this page.\n");
@@ -1415,7 +1426,6 @@ void print_help_page(void) {
     printf("=======================================\n");
     printf("Press 'Enter' to continue.\n");
 
-    char c;
     while (1) {
         c = getchar();
 
@@ -1477,12 +1487,18 @@ void state_try_move(ConsoleColorContext* ctx,
                     PieceSide aiSide, 
                     unsigned int difficulty, 
                     int* running) {
+
+    MoveNode userMove;
+    MoveNode aiMove;
+    Piece p;
+    String* aiMoveStr;
+
     if (!check_if_string_is_move(input)) {
         printf("Input is not a valid move nor instruction, please re-enter(try help ?).\n");
         return;
     }
     
-    MoveNode userMove = convert_string_to_move(input);
+    userMove = convert_string_to_move(input);
     if (!is_this_your_piece(cb, &userMove, userSide)){
         printf("This piece is not yours, please choose your piece.\n");
         return;
@@ -1504,9 +1520,9 @@ void state_try_move(ConsoleColorContext* ctx,
 
     printf("AI thinking...\n");
 
-    MoveNode aiMove = gen_best_move_for(cb, aiSide, difficulty);
-    Piece p = cb->data[aiMove.beginRow][aiMove.beginCol];
-    String* aiMoveStr = convert_move_to_string(&aiMove);
+    aiMove = gen_best_move_for(cb, aiSide, difficulty);
+    p = cb->data[aiMove.beginRow][aiMove.beginCol];
+    aiMoveStr = convert_move_to_string(&aiMove);
 
     board_move(cb, &aiMove);
     draw_board(ctx, cb);

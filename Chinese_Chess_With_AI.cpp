@@ -1,5 +1,5 @@
 /*
-    @author yuanshixi
+    @author yuanluo2
 */
 #include <iostream>
 #include <string>
@@ -15,8 +15,8 @@
 #endif
 
 /*
-	Chinese chess board is 10 x 9,
-	to speed up rules checking, I added 2 lines for both the top, left, bottom and right sides.
+    Chinese chess board is 10 x 9,
+    to speed up rules checking, I added 2 lines for both the top, left, bottom and right sides.
 */
 constexpr int32_t BOARD_ROW_LEN = 10;
 constexpr int32_t BOARD_COL_LEN =  9;
@@ -798,8 +798,8 @@ PossibleMoves gen_possible_moves(const ChessBoard& cb, PieceSide side){
 }
 
 /* 
-	calculate a chess board's score. 
-	upper side value is negative, down side is positive.
+    calculate a chess board's score. 
+    upper side value is negative, down side is positive.
 */
 int32_t board_calc_score(const ChessBoard& cb){
     int32_t totalScore = 0;
@@ -809,9 +809,9 @@ int32_t board_calc_score(const ChessBoard& cb){
         for (int32_t c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c){
             p = cb.get(r, c);
 
-			if (p != P_EE){
-				totalScore += piece_get_value(p);
-				totalScore += piece_get_pos_value(p, r - BOARD_ACTUAL_ROW_BEGIN, c - BOARD_ACTUAL_COL_BEGIN);
+            if (p != P_EE){
+                totalScore += piece_get_value(p);
+                totalScore += piece_get_pos_value(p, r - BOARD_ACTUAL_ROW_BEGIN, c - BOARD_ACTUAL_COL_BEGIN);
             }
         }
     }
@@ -1061,12 +1061,12 @@ public:
     };
 
     ConsoleColor() {
-	#ifdef _WIN32
+    #ifdef _WIN32
         CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-	hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleScreenBufferInfo(hOutHandle, &csbiInfo);
-	oldColorAttrs = csbiInfo.wAttributes;
-	#endif
+    hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(hOutHandle, &csbiInfo);
+    oldColorAttrs = csbiInfo.wAttributes;
+    #endif
     }
 
     ~ConsoleColor() noexcept {
@@ -1074,7 +1074,7 @@ public:
     }
 
     void set(int color) noexcept {
-        #ifdef __linux__
+        #if defined(__linux__) || defined(__Free_BSD__)
         switch(color) {
             case Black:
                 std::cout << "\033[30m"; break;
@@ -1116,7 +1116,7 @@ public:
     }
 
     void reset() noexcept {
-        #ifdef __linux__
+        #if defined(__linux__) || defined(__Free_BSD__)
         std::cout << "\033[0m";
         #elif defined(_WIN32)
         SetConsoleTextAttribute(hOutHandle, oldColorAttrs);
@@ -1201,7 +1201,7 @@ void print_help_page(){
     std::cout << "=======================================\n";
     std::cout << "Press any key to continue.\n";
 
-    // ignore any input.	
+    // ignore any input.    
     std::string line;
     std::getline(std::cin, line);
 }

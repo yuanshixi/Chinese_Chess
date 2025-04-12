@@ -1129,46 +1129,44 @@ void draw_board(const ChessBoard& cb){
     ConsoleColor cc;
     int n = BOARD_ROW_LEN - 1;
 
-    cc.set(ConsoleColor::BoldWhite);
     std::cout << "\n    +-------------------+\n";
 
     int r, c;
     for (r = BOARD_ACTUAL_ROW_BEGIN; r <= BOARD_ACTUAL_ROW_END; ++r) {
         if (r == BOARD_CHU_HAN_LINE){
-            cc.set(ConsoleColor::BoldWhite);
             std::cout << "    |===================|\n";
             std::cout << "    |===================|\n";
         }
 
-        cc.set(ConsoleColor::BoldWhite);
-        std::cout << " " << n-- << "  | ";
+        cc.set(ConsoleColor::Yellow);
+        std::cout << " " << n--;
+        cc.reset();
+
+        std::cout << "  | ";
 
         for (c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c){
             Piece p = cb.get(r, c);
 
             if (piece_get_side(p) == PS_UP) {
                 cc.set(ConsoleColor::BoldBlue);
-                std::cout << piece_get_char(p);
-                cc.set(ConsoleColor::BoldWhite);
-                std::cout << " ";
             }
             else if (piece_get_side(p) == PS_DOWN) {
                 cc.set(ConsoleColor::BoldRed);
-                std::cout << piece_get_char(p);
-                cc.set(ConsoleColor::BoldWhite);
-                std::cout << " ";
             }
             else {
-                std::cout << piece_get_char(p) << " ";
+                cc.set(ConsoleColor::White);
             }
+
+            std::cout << piece_get_char(p) << " ";
+            cc.reset();
         }
 
-        cc.set(ConsoleColor::BoldWhite);
         std::cout << "|\n";
     }
 
-    cc.set(ConsoleColor::BoldWhite);
     std::cout << "    +-------------------+\n";
+
+    cc.set(ConsoleColor::BoldGreen);
     std::cout << "\n      a b c d e f g h i\n\n";
     cc.reset();
 }

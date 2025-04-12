@@ -11,5 +11,6 @@ cmake -G "MinGW Makefiles" -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
 mingw32-make -j 4
 ```
 
-![image](https://github.com/user-attachments/assets/992ded9c-5f67-4a4b-b0f8-6e630cbc7a63)
+![image](https://github.com/user-attachments/assets/d6fa1a7b-2413-465b-8d61-b224a8967850)
+
 

@@ -1,5 +1,6 @@
 /*
-    @author yuanluo2
+    @author yuanukim
+    @brief  Chinese chess game with alpha-beta pruning AI, written in C++14.
 */
 #include <iostream>
 #include <string>

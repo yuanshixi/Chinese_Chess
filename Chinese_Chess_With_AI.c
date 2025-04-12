@@ -1,5 +1,5 @@
 /*
-    @author yuanluo2
+    @author yuanukim
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -914,9 +914,9 @@ long evaluate_board(ChessBoard* cb) {
         for (c = BOARD_ACTUAL_COL_BEGIN; c <= BOARD_ACTUAL_COL_END; ++c){
             p = cb->data[r][c];
 
-			if (p != P_EE){
-				totalScore += piece_get_value(p);
-				totalScore += piece_get_pos_value(p, r - BOARD_ACTUAL_ROW_BEGIN, c - BOARD_ACTUAL_COL_BEGIN);	
+            if (p != P_EE){
+                totalScore += piece_get_value(p);
+                totalScore += piece_get_pos_value(p, r - BOARD_ACTUAL_ROW_BEGIN, c - BOARD_ACTUAL_COL_BEGIN);   
             }
         }
     }
@@ -1105,7 +1105,7 @@ void string_get_line(String* str) {
         if (c == '\n' || c == EOF) {
             break;
         }
-	else if (c == ' ' || c == '\t') {   /* ignore all spaces and tab. */
+        else if (c == ' ' || c == '\t') {   /* ignore all spaces and tab. */
             continue;
         }
         else {
@@ -1148,9 +1148,9 @@ typedef struct ConsoleColorContext {
 void console_color_context_init(ConsoleColorContext* ctx) {
     #ifdef _WIN32
         CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-	    ctx->hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	    GetConsoleScreenBufferInfo(ctx->hOutHandle, &csbiInfo);
-	    ctx->oldColorAttrs = csbiInfo.wAttributes;
+        ctx->hOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+        GetConsoleScreenBufferInfo(ctx->hOutHandle, &csbiInfo);
+        ctx->oldColorAttrs = csbiInfo.wAttributes;
     #endif
 }
 
@@ -1199,7 +1199,7 @@ WORD get_windows_color_attr(int color) {
 #endif
 
 void reset_console_color(ConsoleColorContext* ctx) {
-    #ifdef __linux__
+    #if defined(__linux__) || defined(__Free_BSD__)
         printf("\033[0m");
     #elif defined(_WIN32)
         SetConsoleTextAttribute(ctx->hOutHandle, ctx->oldColorAttrs);
@@ -1207,7 +1207,7 @@ void reset_console_color(ConsoleColorContext* ctx) {
 }
 
 void set_console_color(ConsoleColorContext* ctx, ConsoleColor cc) {
-    #ifdef __linux__
+    #if defined(__linux__) || defined(__Free_BSD__)
     switch(cc) {
         case CC_Black:
             printf("\033[30m"); break;
